@@ -52,6 +52,10 @@ String grownUpNote(String code, String detail) {
     "function_not_deployed" =>
       "For the grown-up: the tutor function isn't deployed. In the project "
           "folder run: supabase functions deploy tutor",
+    "quota_unavailable" =>
+      "For the grown-up: the daily-usage counter didn't answer, so the "
+          "function refused to spend anything. Check bump_usage exists in "
+          "Supabase \u2192 SQL editor; run_this_in_supabase.sql creates it.",
     // The rest are either the child's own doing (she has chatted a lot today)
     // or plainly temporary, and a technical line would only alarm.
     "daily_limit" || "rate_limited" || "offline" || "slow" ||
@@ -82,6 +86,9 @@ String _childError(String code, int? limit) => switch (code) {
           "setting the app up. Nothing is wrong with your work.",
       "function_not_deployed" => "Teacher isn't switched on yet — a grown-up needs to finish "
           "setting the app up. Nothing is wrong with your work.",
+      "quota_unavailable" =>
+        "Teacher can't count today's messages just now, so she's stopped "
+            "rather than carry on — that's deliberate. Try again in a minute.",
       "offline" => "No internet just now. Check the wifi, then press send again — "
           "your message is still here.",
       "slow" => "That's taking longer than it should. Press send again — a photo taken "

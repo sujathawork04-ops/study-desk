@@ -13,6 +13,55 @@ import "../theme.dart";
 import "pin_dialog.dart";
 import "setup.dart";
 
+/// Open Settings — through the parent PIN, when there is one.
+///
+/// DEFECT C3, and the worst one in the app. The ⚙️ is on every tab and used to
+/// open straight into the children, the setup, Sign out, the account's email
+/// address and (since build 57) its password. A child exploring could point
+/// the login email at an address she controlled, reset the password from
+/// there and own the account — while the parent tab two inches away asked for
+/// a PIN. The lock was on one door of two.
+///
+/// Unlocking here unlocks the parent tab as well, deliberately: they are the
+/// same room, and asking twice in ten seconds teaches a parent to turn the PIN
+/// off. The way back in when the PIN is forgotten is the account password,
+/// exactly as on the parent tab.
+Future<void> openSettings(BuildContext context, AppState state) async {
+  final student = state.student;
+  if (student != null &&
+      settingsLocked(pin: student.parentPin, unlocked: state.parentUnlocked)) {
+    final addr = db.sb.auth.currentUser?.email ?? "";
+    final done = await showDialog<String>(
+      context: context,
+      builder: (_) => PinDialog(
+        title: "Settings",
+        note: "Settings holds the children, this account's email address and "
+            "its password, so it asks for the parent PIN.",
+        needCurrent: true,
+        needNew: false,
+        currentHash: student.parentPin,
+        email: addr,
+        checkPassword: (password) async {
+          try {
+            await db.sb.auth.signInWithPassword(email: addr, password: password);
+            return true;
+          } on AuthException {
+            return false;
+          }
+        },
+        confirmLabel: "Open settings",
+      ),
+    );
+    if (done == null) return;                 // backed out, or got it wrong
+    if (!context.mounted) return;
+    state.unlockParent();
+  }
+  if (!context.mounted) return;
+  await Navigator.of(context).push(MaterialPageRoute(
+    builder: (_) => Scope(state: state, child: const SettingsScreen()),
+  ));
+}
+
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
   @override

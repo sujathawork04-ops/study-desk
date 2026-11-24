@@ -7,6 +7,17 @@ import "models.dart";
 bool parentTabLocked({required String? pin, required bool unlocked}) =>
     (pin ?? "").isNotEmpty && !unlocked;
 
+/// Settings sits behind the SAME lock as the parent tab.
+///
+/// It was not, and that was the worst defect in the app. The ⚙️ is on every
+/// tab, and behind it are the children, the setup, Sign out, the account's
+/// email address and its password. A child who wandered in could point the
+/// login email at an address she controlled, reset the password from there,
+/// and own the account — past a parent tab that was carefully locked two
+/// inches away. One lock, both doors.
+bool settingsLocked({required String? pin, required bool unlocked}) =>
+    parentTabLocked(pin: pin, unlocked: unlocked);
+
 /// A small, stable hash for the parent PIN. The PIN only keeps a nine-year-old
 /// out of the parent tab — it is not protecting anything a stranger can reach.
 String pinHash(String s) {

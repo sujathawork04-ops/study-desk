@@ -64,9 +64,8 @@ class _HomeShellState extends State<HomeShell> with WidgetsBindingObserver {
       setState(() { tab = 3; chatPrefill = prefill; chatWantsPhoto = withPhoto; });
 
   Future<void> _openSettings(AppState state) async {
-    await Navigator.of(context).push(MaterialPageRoute(
-      builder: (_) => Scope(state: state, child: const SettingsScreen()),
-    ));
+    // Through the PIN when there is one — see openSettings in settings.dart.
+    await openSettings(context, state);
     if (mounted) {
       setState(() {});
     }

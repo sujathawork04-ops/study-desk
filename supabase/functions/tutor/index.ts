@@ -21,6 +21,11 @@ const MODELS = { quick: "claude-haiku-4-5", default: "claude-sonnet-4-5" };
 const MAX_TOKENS = 1400;          // the default: a conversation turn
 const MAX_TOKENS_CEILING = 8000;  // the most any one job may ask for
 
+// How far past the conversation limit the app's own reading may go in a day.
+// A 40-page chapter is twenty calls, so this is several whole books — generous
+// for a family, and still a wall. Before this there was no wall at all.
+const READ_HEADROOM = 200;
+
 const cors = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
@@ -67,14 +72,35 @@ Deno.serve(async (req) => {
   // photographing a page. They used to count, so uploading a 23-page chapter
   // (twelve batches) spent a quarter of the day's allowance before she had
   // asked a single question — and the cap fell on the evening before an exam.
-  // Tokens are still recorded below either way, so the real cost stays visible.
+  //
+  // DEFECT H1. The old fix was to pass msgs: 0 and skip the limit entirely
+  // when the CLIENT said wantJson. `wantJson` is a field in a request body
+  // anyone signed in can write, so one line in a console bought unlimited
+  // calls billed to this project's card, and nothing counted them.
+  //
+  // Background reads now COUNT like everything else; they simply get their own
+  // headroom above the conversation limit. A chapter is still free of the
+  // chat allowance, an attacker is not free of anything, and either way the
+  // ceiling is reached and the day stops.
   const isBackgroundRead = body.wantJson === true;
 
   const { data: used } = await admin.rpc("bump_usage", {
-    sid: body.studentId, d: today, msgs: isBackgroundRead ? 0 : 1, tin: 0, tout: 0,
+    sid: body.studentId, d: today, msgs: 1, tin: 0, tout: 0,
   });
-  if (!isBackgroundRead && typeof used === "number" && used > limit) {
+
+  // DEFECT H1, second half: this used to be `typeof used === "number" && ...`,
+  // so if bump_usage was missing, slow or broken, the comparison was simply
+  // skipped and every request went through — the quota failed OPEN, which is
+  // the one direction a spend limit must never fail. If the count cannot be
+  // read, nothing is spent.
+  if (typeof used !== "number") {
+    return json({ error: "quota_unavailable" }, 503);
+  }
+  if (!isBackgroundRead && used > limit) {
     return json({ error: "daily_limit", limit }, 429);
+  }
+  if (used > limit + READ_HEADROOM) {
+    return json({ error: "daily_limit", limit: limit + READ_HEADROOM }, 429);
   }
 
   // ---- build the Anthropic request -------------------------------------
@@ -92,7 +118,12 @@ Deno.serve(async (req) => {
 
   const wantStream = body.stream === true && !body.wantJson;
   const payload = {
-    model: MODELS[(body.tier as keyof typeof MODELS) ?? "default"] ?? MODELS.default,
+    // Object.hasOwn, not a bare lookup: `tier: "constructor"` used to return a
+    // function, which JSON.stringify drops, so the request went up with no
+    // model at all and came back as an error nobody could explain.
+    model: Object.hasOwn(MODELS, String(body.tier))
+        ? MODELS[body.tier as keyof typeof MODELS]
+        : MODELS.default,
     max_tokens: Math.min(
       Math.max(Number(body.maxTokens) || MAX_TOKENS, 256),
       MAX_TOKENS_CEILING,
