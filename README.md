@@ -56,8 +56,11 @@ an answer is right, how a markdown line breaks into spans, how much effort a
 pulley saves, what happens when the same chapter is scanned twice.
 
 That means the interesting parts are testable without a device, an emulator or
-a golden file. **33 test files, 500 passing tests, no widget tests.** The
-screens are deliberately thin — they call a rule and draw the result.
+a golden file. **33 test files, 500 passing tests**, the great majority of them
+pure-logic tests that run in five seconds. The screens are deliberately thin —
+they call a rule and draw the result — so only 40 widget tests are needed, for
+the few places where the screen itself is the thing worth asserting on: the
+PIN lock, the picture blocks, the settings card.
 
 ```bash
 sh check.sh        # flutter analyze + flutter test, output to check-output.txt

@@ -116,7 +116,7 @@ void main() {
     });
 
     test("a child with no level set is taught thoroughly, not gently", () {
-      final s = Student.fromJson({"id": "1", "name": "Sai"});
+      final s = Student.fromJson({"id": "1", "name": "Meera"});
       expect(s.strictness, isNull);
       expect(strictnessBlock(s.strictness ?? "firm"), strictnessBlock("firm"));
     });

@@ -76,3 +76,6 @@ android/.gradle/
 # requests billed to this project's API credit, and an unfixed path to a parent
 # account — against a deployment that is live. Not a thing to hand a stranger.
 QA_FINDINGS.md
+
+# A scratch copy, kept on this machine only.
+test/*.unused

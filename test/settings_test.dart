@@ -83,7 +83,7 @@ void main() {
       await tester.pumpWidget(wrap(deskFor(s), const ParentScreen()));
 
       expect(find.text("Unlock"), findsNothing);
-      expect(find.textContaining("Sai"), findsWidgets);   // the day, not the lock
+      expect(find.textContaining("Meera"), findsWidgets);   // the day, not the lock
     });
 
     testWidgets("turning a PIN on locks the parent tab straight away",
