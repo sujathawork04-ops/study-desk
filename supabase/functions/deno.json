@@ -1,0 +1,11 @@
+{
+  "//": "Marks this folder as a Deno project so the editor stops type-checking it as Node. Supabase itself does not need this file; it is purely for a quiet editor.",
+  "imports": {
+    "@supabase/supabase-js": "https://esm.sh/@supabase/supabase-js@2"
+  },
+  "lint": {
+    "rules": {
+      "tags": ["recommended"]
+    }
+  }
+}

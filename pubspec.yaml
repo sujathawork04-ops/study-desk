@@ -1,0 +1,29 @@
+name: study_desk
+description: A patient AI tutor for one child — homework checked (never answered), daily practice, tests and competitions.
+publish_to: "none"
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.3.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  supabase_flutter: ^2.5.6      # auth + database + storage
+  http: ^1.2.1                  # the tutor Edge Function, including streaming
+  image_picker: ^1.1.2          # diary and notebook photos
+  flutter_tts: ^4.0.2           # Teacher reads aloud, in any script
+  # 7.x, not 6.x: the 6.6 Android build still calls jcenter(), which Gradle 9
+  # removed outright — so a modern toolchain cannot build the app at all. The
+  # listen API this app uses (SpeechListenOptions) is the same in both.
+  speech_to_text: ^7.0.0        # the child speaks her doubt
+  shared_preferences: ^2.2.3    # remembered language, small local choices
+  intl: ^0.19.0                 # dates in the child's own timezone
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
