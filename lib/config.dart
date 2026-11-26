@@ -10,7 +10,7 @@
 class Config {
   /// Bumped whenever the app changes, and shown at the bottom of Settings —
   /// the quickest way to tell a fresh build from one the browser cached.
-  static const build = "2026-11-24 · 61";
+  static const build = "2026-11-26 · 62";
 
   static const supabaseUrl = String.fromEnvironment("SUPABASE_URL");
   static const supabaseAnonKey = String.fromEnvironment("SUPABASE_ANON_KEY");

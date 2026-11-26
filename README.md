@@ -170,4 +170,13 @@ phone is told to say so rather than fail quietly.
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE).
+**AGPL-3.0** — see [LICENSE](LICENSE).
+
+Use it, change it, run it for your school or your centre, free. The one
+condition: if you deploy a changed version for other people to use, publish
+your changes. The point of this project is that a child somewhere else gets
+taught rather than told the answer; improvements to how that is done should
+come back, not disappear into someone's private fork.
+
+Earlier releases of this code were published under the MIT licence, and that
+grant stands for those versions. Everything from build 62 onward is AGPL-3.0.
